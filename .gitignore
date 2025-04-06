@@ -1,0 +1,21 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment variables
+.env
+
+
+
+
+
+# messy list from chatgpt
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.uv/
+.venv.bak/
+*.log
+*.sqlite3
