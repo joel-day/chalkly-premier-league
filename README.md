@@ -22,17 +22,6 @@ uv pip sync
 
 #How it works: ensure everything in your environment is fully up to date according to your pyproject.toml, including upgrading or downgrading packages to the exact versions specified.
 uv sync --all-packages
+```
 
-
-## initate the league Teams 
-
-
-## Initate team PLayers
-
-## Play a game
-
-## View current league status
-
-## Run the draft
-
-## Start new season
+## Features coming soon
