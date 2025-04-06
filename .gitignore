@@ -6,11 +6,13 @@ ENV/
 # Environment variables
 .env
 
-# messy list from chatgpt
+# pychache file created by pytest
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# messy list from chatgpt
 .uv/
 .venv.bak/
 *.log
