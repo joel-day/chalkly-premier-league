@@ -6,6 +6,14 @@ The draft occurs in the offseason, and considers the custom team and player pref
 
 ## Installation
 
+- **UV**: Used for package management and virtual environment creation. Configured to manage environments in a monorepo setup, ensuring consistency across the project.
+
+- **GitHub Actions**: Ensures that the code works across multiple operating systems (Linux, Mac, and Windows) and supports Python versions 3.10, 3.11, and 3.12. GitHub Actions is a part the CI pipeline, configured to run on pull_request to main.
+
+- **Pytest**: Configured to run tests and verify the correctness of code execution. It ensures that the codebase remains functional and that new changes don’t introduce unexpected behavior.
+
+- **Flake8**: Used for checking code compliance with PEP8 standards. It helps maintain a clean and consistent code style across the project by enforcing formatting and style guidelines.
+
 ```bash
 # Clone the repository
 git clone https://github.com/joel-day/chalkland.git
