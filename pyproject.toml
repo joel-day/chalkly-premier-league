@@ -25,7 +25,6 @@ dependencies = [
 ]
 
 
-
 # Specify the build system
 [build-system]
 requires = ["hatchling"]
