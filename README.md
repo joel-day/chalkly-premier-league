@@ -42,4 +42,6 @@ pytest
 flake8 .
 ```
 
-## Features Coming Soon
+## Create Globe
+
+https://www.piskelapp.com/p/create/sprite
