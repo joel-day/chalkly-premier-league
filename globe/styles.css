@@ -6,6 +6,23 @@ body {
     margin: 0;
 }
 
+#downloadBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#downloadBtn:hover {
+    background-color: #45a049;
+}
+
 a {
     color: #ffcc00;
 }
@@ -26,72 +43,6 @@ img {
     overflow: hidden;
 
 }
-
-#banner {
-    font: 20pt Georgia;
-    font-weight: bold;
-    padding-bottom: 5px;
-    background-color: rgba(0,0,0,.9);
-
-}
-
-#infobox {
-    position: absolute;
-    top: 55px;
-    z-index: 3;
-    left: 10px;
-    width: 325px;
-    background-color: rgba(0,0,0,.8);
-    padding: 0 20px;
-    text-align: justify
-}
-
-#ident {
-    position: fixed;
-    z-index: 5;
-    bottom: 10px;
-    font-siz: 10pt;
-    right: 24px;
-
-}
-
-#ident a{
-    color: #00eeee;
-
-}
-
-input {
-    background-color: #eee;
-    border-radius: 5px;
-}
-
-input[type="text"] {
-    width: 40px;
-    padding: 5px;
-    margin: 5px;
-}
-
-.generateTitle {
-    font-size: 1.3em;
-    padding-bottom: 18px;
-}
-
-.generateLabel {
-    display: inline-block;
-    width: 255px;
-    font-size: .9em;
-}
-
-.generateForm {
-    padding-top: 10px;
-}
-
-button {
-    border-radius: 5px;
-    margin: 15px 3px 20px;
-    padding: 7px 10px;
-}
-
 
 #generateError {
     padding: 0 0 10px 30px;
