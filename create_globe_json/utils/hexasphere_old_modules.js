@@ -244,47 +244,8 @@
             });
         }
 
-        Hexasphere.prototype.toObj = function() {
-
-            var objV = [];
-            var objF = [];
-            var objText = "# vertices \n";
-            var vertexIndexMap = {};
-
-            for(var i = 0; i< this.tiles.length; i++){
-                var t = this.tiles[i];
-                
-                var F = []
-                for(var j = 0; j< t.boundary.length; j++){
-                    var index = vertexIndexMap[t.boundary[j]];
-                    if(index == undefined){
-                        objV.push(t.boundary[j]);
-                        index = objV.length;
-                        vertexIndexMap[t.boundary[j]] = index;
-                    }
-                    F.push(index)
-                }
-
-                objF.push(F);
-            }
-
-            for(var i =0; i< objV.length; i++){
-                objText += 'v ' + objV[i].x + ' ' + objV[i].y + ' ' + objV[i].z + '\n';
-            }
-
-            objText += '\n# faces\n';
-            for(var i =0; i< objF.length; i++){
-                faceString = 'f';
-                for(var j = 0; j < objF[i].length; j++){
-                    faceString = faceString + ' ' + objF[i][j];
-                }
-                objText += faceString + '\n';
-            }
-
-            return objText;
-        }
-
         module.exports = Hexasphere;
+
     },{"./face":2,"./point":4,"./tile":5}],
 
     // points
@@ -540,9 +501,11 @@
             // this.faces = centerPoint.getOrderedFaces();
             // this.boundary = [];
             return {
+                tileId: this.tileId,
                 centerPoint: this.centerPoint.toJson(),
                 boundary: this.boundary.map(function(point){return point.toJson()}),
-                island: this.isLand
+                island: this.isLand,
+                city: this.isCity
             };
 
         }

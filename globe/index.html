@@ -6,31 +6,40 @@
 
         <meta name="Description" content="Fictional Sports World" />
         <meta name="Keywords" content="hexasphere, hexasphere.js, geodesic sphere, geodesic polyhedron, javascript, hexagons" />
+        
+        <script type="importmap">
+        {
+            "imports": {
+                "three": "https://threejs.org/build/three.module.js",
+                "three/addons/": "https://threejs.org/examples/jsm/"
+            }
+        }</script>
+        
         <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
-        <script src="https://unpkg.com/three@0.139.2/examples/js/controls/OrbitControls.js"></script>
 
-
-        <!-- these are just for the demo page / options -->
-
+        <script type="module" src="main.js"></script>
 
         <link href="styles.css" rel="stylesheet" type="text/css" />
 
-        <!-- required for the application -->
-        <script src="include/three.min.js"></script>
-        <script src="include/FileSaver.min.js"></script>
-        <script src="build/hexasphere.js"></script>
-        <script src="main.js"></script>
+        <!-- <script src="include/three.min.js"></script> -->
+        <!-- <script src="include/OrbitControls.js"></script> -->
+
+
+        <!--  <script src="build/hexasphere.js"></script> -->
+        <!-- <script src="main.js"></script> -->
 
     </head>
     <body>
 
         <div id="container">
         </div>
-        <img id="projection" src="equirectangle_projection.png" />
 
-        <button id="downloadBtn">Download JSON</button>
         <!-- ref:include analytics -->
         <!-- endref -->
+         <div id="tileInfoPopup">
+            <button id="closePopupBtn">X</button>
+            <div id="popupContent">
+        </div>
 
     </body>
 </html>
