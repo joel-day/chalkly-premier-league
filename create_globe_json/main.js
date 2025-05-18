@@ -93,10 +93,10 @@ function assignCities(allTiles, num_cities) {
 }
 
 // Main function to process tiles and add isLand property
-async function processTiles(num_cities, projection_image) {
+async function processTiles(num_cities, projection_image, num_divisions) {
     
     // Generate raw hexasphere json
-    const hex = new Hexasphere(30, 25, .95);
+    const hex = new Hexasphere(30, num_divisions, .95);
 
     // Assign Ids
     assignIds(hex.tiles);
@@ -121,10 +121,11 @@ async function processTiles(num_cities, projection_image) {
 
 // Run the function
 var projection_image = './create_globe_json/equirectangle_projection4.png'
-var num_cities = 38;
+var num_cities = 75;
+var num_divisions = 25;
 
 (async () => {
-  const { city_tiles, land_tiles } = await processTiles(num_cities, projection_image);
+  const { city_tiles, land_tiles } = await processTiles(num_cities, projection_image, num_divisions);
   console.log("City Tiles:", city_tiles);
   console.log("Land Tiles:", land_tiles);
 })();

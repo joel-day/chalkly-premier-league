@@ -6,15 +6,8 @@ The draft occurs in the offseason, and considers the custom team and player pref
 
 
 ## To-Do
-Move the globe around with the mouse as opposed to the ticking
-add n cities in gold color to the globe
-
-
-creat a json pipeline outside of html that loads only the json file needed 
-- with isLand
-- is City
-
-click a hexagon and get its information id # so i can manually change stuff
+- create continent label per tile or regional information somehow
+- create teams and players and be able to visduale them on the globe. a list of all player on that spot should appear. 
 
 ## Create Globe
 

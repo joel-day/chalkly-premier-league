@@ -109,6 +109,11 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         this.tiles[t].neighbors = this.tiles[t].neighborIds.map(function(item){return _this.tileLookup[item]});
     }
 
+
+
+
+    
+
 };
 
 
