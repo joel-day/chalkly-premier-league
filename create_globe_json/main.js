@@ -22,19 +22,45 @@ function checkPentagon(tiles) {
     }
 }
 
-function assignLand (tiles, img, radius) {
+function assignLand(tiles, img, radius) {
     const land_tiles = [];
 
-    function isLand (lat, lon){
-        var x = parseInt(img.width * (lon + 180) / 360);
-        var y = parseInt(img.height * (lat + 90) / 180);
+    function isLand(lat, lon) {
+        // Convert lat/lon to x/y pixel coordinates
+        const x = parseInt(img.width * (lon + 180) / 360);
+        const y = parseInt(img.height * (lat + 90) / 180);
 
-        var index = (y * pixelData.width + x) * 4;
-        var alpha = pixelData.data[index + 3];  // Alpha channel
+        const index = (y * pixelData.width + x) * 4;
 
-        // Check if pixel is not transparent (alpha > 0)
-        return alpha > 0;
-    };
+        const r = pixelData.data[index];
+        const g = pixelData.data[index + 1];
+        const b = pixelData.data[index + 2];
+        const alpha = pixelData.data[index + 3];
+
+        // Print values for debugging
+        console.log(`Lat: ${lat}, Lon: ${lon}, X: ${x}, Y: ${y}`);
+        console.log(`RGB: (${r}, ${g}, ${b}), Alpha: ${alpha}`);
+
+        // RGB to continent name mapping
+        let continent = null;
+        if (r === 0 && g === 0 && b === 0) {
+            continent = "Velmara";
+        } else if (r === 255 && g === 0 && b === 0) {
+            continent = "Almira";
+        } else if (r === 0 && g === 255 && b === 0) {
+            continent = "Brontis";
+        } else if (r === 0 && g === 0 && b === 255) {
+            continent = "Caldra";
+        } else if (r === 255 && g === 255 && b === 255) {
+            continent = "Zevarn";
+        }
+
+        // Still return whether it's land and which continent
+        return {
+            land: alpha > 0,
+            continent: alpha > 0 ? continent : 'na'
+        };
+    }
 
     const projectionCanvas = createCanvas(img.width, img.height);
     const projectionContext = projectionCanvas.getContext('2d');
@@ -46,24 +72,23 @@ function assignLand (tiles, img, radius) {
 
     var pixelData = projectionContext.getImageData(0, 0, img.width, img.height);
 
-
     for (const t of tiles) {
+        const latLon = t.getLatLon(radius);
 
-        var latLon = t.getLatLon(radius);
+        const { land, continent } = isLand(latLon.lat, latLon.lon);
 
-        if(isLand(latLon.lat, latLon.lon)){
-            t.isLand = true;
-            land_tiles.push(t);
-        } else {
-            t.isLand = false;
-        }
+        t.land = land;
+        t.continent = continent;
+        land_tiles.push(t);
+
+
     }
 
     return land_tiles; // Optional, returns list of city tiles
 };
 
 function assignCities(allTiles, num_cities) {
-    const landTiles = allTiles.filter(t => t.isLand && t.pentagon === false);
+    const landTiles = allTiles.filter(t => t.land && t.pentagon === false);
     const city_tiles = [];
     
     // Shuffle the land tiles randomly
@@ -112,21 +137,18 @@ async function processTiles(num_cities, projection_image, num_divisions) {
 
     // Write to a file
     const jsonData = hex.toJson();
-    fs.writeFileSync('globe/hexasphere.json', jsonData, 'utf8');
-    console.log('JSON saved to hexasphere.json');
+    fs.writeFileSync('visualize_globe_data/hexasphere.json', jsonData, 'utf8');
 
     return { city_tiles, land_tiles };
 
 };
 
 // Run the function
-var projection_image = './create_globe_json/equirectangle_projection4.png'
+var projection_image = './create_globe_json/projection.png'
 var num_cities = 75;
 var num_divisions = 25;
 
 (async () => {
   const { city_tiles, land_tiles } = await processTiles(num_cities, projection_image, num_divisions);
-  console.log("City Tiles:", city_tiles);
-  console.log("Land Tiles:", land_tiles);
 })();
 

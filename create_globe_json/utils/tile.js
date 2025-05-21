@@ -128,8 +128,9 @@ Tile.prototype.toJson = function(){
         }),
         boundary: this.boundary.map(function(point){return point.toJson()}),
         pentagon: this.pentagon,
-        isLand: this.isLand,
+        land: this.land,
         city: this.isCity,
+        continent: this.continent,
     };
 
 }

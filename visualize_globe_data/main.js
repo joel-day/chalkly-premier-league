@@ -14,8 +14,9 @@ $(function() {
             z: parseFloat(p.z)
         }));
         this.pentagon = data.pentagon;
-        this.isLand = data.isLand;
+        this.land = data.land;
         this.isCity = data.city;
+        this.continent = data.continent;
         this.mesh = null;
     }
 
@@ -45,6 +46,10 @@ $(function() {
     var previousMousePosition = new THREE.Vector2();
     var intersectedPoint = null;
 
+    let targetZoom = camera.position.z; // Current zoom target
+    const minZoom = 60;
+    const maxZoom = 120;
+
 
     var meshMaterials = [];
     meshMaterials.push(new THREE.MeshBasicMaterial({color: 0x7cfc00, transparent: true}));
@@ -56,6 +61,72 @@ $(function() {
     meshMaterials.push(new THREE.MeshBasicMaterial({color: 0x4cbb17, transparent: true}));
     meshMaterials.push(new THREE.MeshBasicMaterial({color: 0x00ee00, transparent: true}));
     meshMaterials.push(new THREE.MeshBasicMaterial({color: 0x00aa11, transparent: true}));
+
+    // Velmara - Red
+    var velmaraMaterials = [];
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0xcc0000, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0xaa0000, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0xee2222, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0xbb1111, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0xdd4444, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x7cfc00, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x397d02, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x77ee00, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x7cfc00, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x397d02, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x77ee00, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x61b329, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x83f52c, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x83f52c, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x4cbb17, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x00ee00, transparent: true}));
+    velmaraMaterials.push(new THREE.MeshBasicMaterial({color: 0x00aa11, transparent: true}));
+
+    // Almira - Blue
+    var almiraMaterials = [];
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x0000ff, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x0000cc, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x2222ee, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x4444dd, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x1111bb, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x3333ff, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x61b329, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x83f52c, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x4cbb17, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x7cfc00, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x397d02, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x77ee00, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x61b329, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x83f52c, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x83f52c, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x4cbb17, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x00ee00, transparent: true}));
+    almiraMaterials.push(new THREE.MeshBasicMaterial({color: 0x00aa11, transparent: true}));
+
+    // Brontis - Black
+    var brontisMaterials = [];
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x000000, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x111111, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x222222, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x333333, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x444444, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x555555, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x00ee00, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x00aa11, transparent: true}));
+    brontisMaterials.push(new THREE.MeshBasicMaterial({color: 0x77ee00, transparent: true}));
+
+    // Caldra - Purple
+    var caldraMaterials = [];
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0x800080, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0x9932cc, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0xba55d3, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0x9400d3, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0xda70d6, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0xd8bfd8, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0x77ee00, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0x61b329, transparent: true}));
+    caldraMaterials.push(new THREE.MeshBasicMaterial({color: 0x83f52c, transparent: true}));
 
     var oceanMaterial = []
     oceanMaterial.push(new THREE.MeshBasicMaterial({color: 0x0f2342, transparent: true}));
@@ -113,8 +184,23 @@ $(function() {
 
                 if (t.isCity) {
                     material = cityMaterial[0].clone();  // city overrides everything
-                } else if (t.isLand) {
-                    material = meshMaterials[Math.floor(Math.random() * meshMaterials.length)].clone();
+                } else if (t.land) {
+                    switch (t.continent) {
+                        case "Velmara":
+                            material = velmaraMaterials[Math.floor(Math.random() * velmaraMaterials.length)].clone();
+                            break;
+                        case "Almira":
+                            material = almiraMaterials[Math.floor(Math.random() * almiraMaterials.length)].clone();
+                            break;
+                        case "Brontis":
+                            material = brontisMaterials[Math.floor(Math.random() * brontisMaterials.length)].clone();
+                            break;
+                        case "Caldra":
+                            material = caldraMaterials[Math.floor(Math.random() * caldraMaterials.length)].clone();
+                            break;
+                        default:
+                            material = meshMaterials[Math.floor(Math.random() * meshMaterials.length)].clone(); // fallback
+                    }
                 } else {
                     material = oceanMaterial[Math.floor(Math.random() * oceanMaterial.length)].clone();
                 }
@@ -192,6 +278,7 @@ $(function() {
     var animate = function () {
         requestAnimationFrame(animate);
         // globeGroup.rotation.y += 0.005;
+        camera.position.z += (targetZoom - camera.position.z) * 0.1;
         renderer.render(scene, camera);
     };
 
@@ -233,6 +320,7 @@ $(function() {
                 const infoHtml = `
                     <strong>Tile ID:</strong> ${tile.tileId}<br>
                     <strong>Center Point:</strong> ${JSON.stringify(tile.centerPoint)}<br>
+                    <strong>Continent:</strong> ${JSON.stringify(tile.continent)}<br>
                     <strong>Neighbors:</strong> ${tile.neighbors}
                     }
                 `;
@@ -304,6 +392,18 @@ $(function() {
         }
     }
 
+
+
+    // Handle scroll wheel to adjust zoom
+    window.addEventListener('wheel', function (event) {
+        event.preventDefault();
+
+        // Adjust zoom target with scroll delta
+        targetZoom += event.deltaY * 0.1;
+
+        // Clamp zoom target within limits
+        targetZoom = Math.max(minZoom, Math.min(maxZoom, targetZoom));
+    }, { passive: false });
 });
 
 
