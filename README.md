@@ -7,9 +7,15 @@ Each team is guided by a machine learning model trained on the previous game dat
 ![Globe May 2025](/data/globe_may_2025.png)
 
 ## World Overview
+- Around 6000 tiles
 - 4 continents
+    - Velmara: 490 tiles
+    - Almira: 484 tiles
+    - Brontis: 487 tiles
+    - Caldra: 486 tiles
 - 8 cities on each continent (32 total)
 - Each city has a pro team (32), and two clubs (64)
+
 
 ## Pro Teams 
 - 8 teams on each continent
