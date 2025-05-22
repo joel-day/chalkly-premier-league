@@ -37,10 +37,6 @@ function assignLand(tiles, img, radius) {
         const b = pixelData.data[index + 2];
         const alpha = pixelData.data[index + 3];
 
-        // Print values for debugging
-        console.log(`Lat: ${lat}, Lon: ${lon}, X: ${x}, Y: ${y}`);
-        console.log(`RGB: (${r}, ${g}, ${b}), Alpha: ${alpha}`);
-
         // RGB to continent name mapping
         let continent = null;
         if (r === 0 && g === 0 && b === 0) {
@@ -88,33 +84,62 @@ function assignLand(tiles, img, radius) {
 };
 
 function assignCities(allTiles, num_cities) {
-    const landTiles = allTiles.filter(t => t.land && t.pentagon === false);
     const city_tiles = [];
-    
-    // Shuffle the land tiles randomly
-    for (let i = landTiles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [landTiles[i], landTiles[j]] = [landTiles[j], landTiles[i]];
+
+    // Ensure all tiles have isCity initialized
+    for (const tile of allTiles) {
+        tile.isCity = false;
     }
 
+    // Filter valid land tiles (non-pentagon)
+    const landTiles = allTiles.filter(t => t.land && !t.pentagon);
+
+    // Group land tiles by continent
+    const continents = {};
     for (const tile of landTiles) {
-        // Check if any neighbors are already cities
-        const hasCityNeighbor = tile.neighbors.some(n => n.isCity);
-        if (!hasCityNeighbor) {
-            tile.isCity = true;
-            city_tiles.push(tile);
-            if (city_tiles.length >= num_cities) break;
-        } else {
-            tile.isCity = false;
+        const continent = tile.continent;
+        if (!continent) continue; // Skip if continent is undefined
+        if (!continents[continent]) {
+            continents[continent] = [];
+        }
+        continents[continent].push(tile);
+    }
+
+    // Utility: Shuffle an array in-place
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
     }
 
-    // For all other land tiles not selected, ensure isCity is false
-    for (const tile of allTiles) {
-        if (!tile.isCity) tile.isCity = false;
+    // Assign cities per continent
+    for (const [continent, tiles] of Object.entries(continents)) {
+        const citiesToPlace = num_cities[continent] || 0;
+        if (tiles.length === 0 || citiesToPlace === 0) continue;
+
+        shuffle(tiles); // Randomize tile order
+
+        let placed = 0;
+        for (const tile of tiles) {
+            if (placed >= citiesToPlace) break;
+
+            // Ensure neighbors are actual tile objects
+            const hasCityNeighbor = tile.neighbors.some(n => n.isCity === true);
+
+            if (!hasCityNeighbor) {
+                tile.isCity = true;
+                city_tiles.push(tile);
+                placed++;
+            }
+        }
+
+        if (placed < citiesToPlace) {
+            console.warn(`Not enough valid city tiles in ${continent}. Only placed ${placed} of ${citiesToPlace}.`);
+        }
     }
 
-    return city_tiles; // Optional, returns list of city tiles
+    return city_tiles;
 }
 
 // Main function to process tiles and add isLand property
@@ -145,7 +170,13 @@ async function processTiles(num_cities, projection_image, num_divisions) {
 
 // Run the function
 var projection_image = './create_globe_json/projection.png'
-var num_cities = 75;
+const num_cities = {
+    Velmara: 8,
+    Almira: 8,
+    Brontis: 8,
+    Caldra: 8
+    // Zevarn can be omitted or added if needed
+};
 var num_divisions = 25;
 
 (async () => {
