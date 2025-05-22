@@ -4,8 +4,9 @@ This is a fictional sports league where there are 32 Pro teams, 64 Club teams, a
 
 Each team is guided by a machine learning model trained on the previous game data. Club team locations are determined using KNN, emulating organic sports league growth. 
 
+https://www.piskelapp.com/p/create/sprite source to draw pixel map for custom geography.
+
 ![Globe May 2025](/data/globe_may_2025.png)
-- https://www.piskelapp.com/p/create/sprite source to draw pixel map for custom geography
 
 ## World Overview
 - 4 continents
