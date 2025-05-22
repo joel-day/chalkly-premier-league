@@ -1,4 +1,4 @@
-# Chalk Kush League Bush, 
+# Chalkly Premier league - CPL
 
 This is a fictional sports league where there are 32 Pro teams, 64 Club teams, and 100s of players equipped with unique strengths across 4 primary skills. Each team and player have a location on the map, which influences both trait generation and player preference for teams. Just like in real-world major sports leagues, the team’s draft players, play seasonal matchups, and fight for the championship. 
 
@@ -48,7 +48,7 @@ The draft occurs in the offseason and considers the custom team and player prefe
 - Can trade money
 - Can trade conditional top 8 pick. 
 
-## Gameplay
+## Chalkly Gameplay
 - each tile offers a club team certain perks
 - Teams can have 12 guys max.8 guys min. 
 - three players are named captain and have to be played 3 times per game. Then the remaining 5-9 players have to be played at least once, but no more than twice.
