@@ -1,19 +1,13 @@
-# Chalkly Premier league - CPL
+# Chalkly Premier League - CPL
 
 This is a fictional sports league where there are 32 Pro teams, 64 Club teams, and 100s of players equipped with unique strengths across 4 primary skills. Each team and player have a location on the map, which influences both trait generation and player preference for teams. Just like in real-world major sports leagues, the team’s draft players, play seasonal matchups, and fight for the championship. 
 
 Each team is guided by a machine learning model trained on the previous game data. Club team locations are determined using KNN, emulating organic sports league growth. 
 
-The draft occurs in the offseason and considers the custom team and player preferences (teams prefer players with certain skills, while players prefer teams based on location and last year’s performance). The teams and players are generated using notebooks and the draft and games are executed using python scripts as packages within the repo. 
-
-## To-Do
-- create teams and players and be able to visualize them on the globe. A list of all players on that spot should appear. 
-
-## Create Globe
-
 ![Globe May 2025](/data/globe_may_2025.png)
 - https://www.piskelapp.com/p/create/sprite source to draw pixel map for custom geography
 
+## World Overview
 - 4 continents
 - 8 cities on each continent (32 total)
 - Each city has a pro team (32), and two clubs (64)
@@ -76,5 +70,8 @@ The draft occurs in the offseason and considers the custom team and player prefe
 - 2 club teams play to see who get to go to globe wide 32 team tourney for scouting exposure
 - As well as other smaller tournamnets hosted on other islands. 
 - The invitations from other contonents cities are for the better of the two cities club teams - as determined by a single match right before the tournament. 
+
+## To-Do
+- create teams and players and be able to visualize them on the globe. A list of all players on that spot should appear. 
 
 
