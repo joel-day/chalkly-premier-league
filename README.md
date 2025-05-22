@@ -12,8 +12,10 @@ The draft occurs in the offseason, and considers the custom team and player pref
 
 ## Create Globe
 
-https://www.piskelapp.com/p/create/sprite
+![Globe May 2025](/data/globe_may_2025.png)
 
+
+- https://www.piskelapp.com/p/create/sprite source to custom draw pixel map
 - 4 continent
 - 8 teams on each continent
 - 32 pro teams, 2 club teams each. 
