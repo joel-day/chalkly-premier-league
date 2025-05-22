@@ -1,5 +1,6 @@
 import *as THREE from "three"
 
+// For working with the tiles from the json
 class VisualTile {
   constructor(data) {
     this.tileId = data.tileId;
@@ -18,6 +19,7 @@ class VisualTile {
   }
 }
 
+// All items related to rendering this globe
 class GlobeApp {
   constructor() {
 
@@ -61,43 +63,35 @@ class GlobeApp {
     }
 
     init() {
-    // This solves a problem with window size when rendering
-    this.onWindowResize();
+        // This solves a problem with window size when rendering
+        this.onWindowResize();
 
-    // Load the data when the class is called
-    this.loadTiles('hexasphere_v1.json').then(() => {
-        console.log('Globe fully initialized');
-        this.animate();
-    });
-    
-    // Add event listeners for the globe's interactive features
-    window.addEventListener('mousedown', this.onMouseDown.bind(this));
-    window.addEventListener('mousemove', this.onMouseMoveDrag.bind(this));
-    window.addEventListener('mouseup', this.onMouseUp.bind(this));
-    window.addEventListener('resize', this.onWindowResize.bind(this), false);
-    window.addEventListener('dblclick', this.onDoubleClick.bind(this));
-    window.addEventListener('mousemove', this.onMouseMoveHighlight.bind(this));
-    window.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
+        // Load the data when the class is called
+        this.loadTiles('hexasphere_v1.json').then(() => {
+            console.log('Globe fully initialized');
+            this.animate();
+        });
+        
+        // Add event listeners for the globe's interactive features
+        window.addEventListener('mousedown', this.onMouseDown.bind(this));
+        window.addEventListener('mousemove', this.onMouseMoveDrag.bind(this));
+        window.addEventListener('mouseup', this.onMouseUp.bind(this));
+        window.addEventListener('resize', this.onWindowResize.bind(this), false);
+        window.addEventListener('dblclick', this.onDoubleClick.bind(this));
+        window.addEventListener('mousemove', this.onMouseMoveHighlight.bind(this));
+        window.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
 
-    // Add a close button to the popup window in the doubleclick feature
-    const closeBtn = document.getElementById('closePopupBtn');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        document.getElementById('tileInfoPopup').style.display = 'none';
-      });
+        // Add a close button to the popup window in the doubleclick feature
+        const closeBtn = document.getElementById('closePopupBtn');
+        if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('tileInfoPopup').style.display = 'none';
+        });
+        }
     }
-    }
 
-    // Load the data from a json file
-    async loadTiles(url) {
-    try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-
-
-    data.tiles.forEach(tileData => {
-        const tile = new VisualTile(tileData);
+    // Helper function for loadTiles.Configure custom tile materials
+    getTileMaterial(tile) {
 
         function createMaterials(colors) {
             return colors.map(color => new THREE.MeshBasicMaterial({ color, transparent: true }));
@@ -127,56 +121,106 @@ class GlobeApp {
             ])
         };
 
-        // Build geometry
-        const geometry = new THREE.BufferGeometry();
-        const vertices = [];
-        const indices = [];
-
-        tile.boundary.forEach(bp => {
-        vertices.push(bp.x, bp.y, bp.z);
-        });
-
-        // Create faces based on number of vertices (assuming pentagon or hexagon)
-        indices.push(0, 1, 2);
-        indices.push(0, 2, 3);
-        indices.push(0, 3, 4);
-        if (vertices.length / 3 > 5) {
-        indices.push(0, 4, 5);
-        }
-
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        geometry.setIndex(indices);
-        geometry.computeVertexNormals();
-
-        // Choose material
-        let material;
         if (tile.isCity) {
-        material = materialsMap["city"][0].clone();
+            return materialsMap["city"][0].clone();
         } else if (tile.land) {
-        const continentKey = tile.continent?.toLowerCase();
-        const materials = materialsMap[continentKey] || materialsMap["land"];
-        material = materials[Math.floor(Math.random() * materials.length)].clone();
+            const continentKey = tile.continent?.toLowerCase();
+            const materials = materialsMap[continentKey] || materialsMap["land"];
+            return materials[Math.floor(Math.random() * materials.length)].clone();
         } else {
-        const oceanMaterials = materialsMap["ocean"];
-        material = oceanMaterials[Math.floor(Math.random() * oceanMaterials.length)].clone();
-        }
-        material.opacity = 1;
-        material.transparent = true;
-
-        const mesh = new THREE.Mesh(geometry, material);
-
-        this.scene.add(mesh);
-        this.globeGroup.add(mesh);
-
-        tile.mesh = mesh;
-        this.tileMap.set(mesh.uuid, tile);
-    });
-
-    console.log('Tiles loaded:', this.tileMap.size);
-
-    } catch (error) {
-    console.error('Error loading tiles:', error);
+            const oceanMaterials = materialsMap["ocean"];
+            return oceanMaterials[Math.floor(Math.random() * oceanMaterials.length)].clone();
     }
+}          
+
+    // Load the data from a json file
+    async loadTiles(url) {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            data.tiles.forEach(tileData => {
+                // Initiate it as a tile object
+                const tile = new VisualTile(tileData);
+
+                function getTileMaterial(tile) {
+
+                        function createMaterials(colors) {
+                            return colors.map(color => new THREE.MeshBasicMaterial({ color, transparent: true }));
+                        }
+
+                        const materialsMap = {
+                            default: createMaterials([
+                                0x7cfc00, 0x397d02, 0x77ee00, 0x61b329, 0x83f52c, 0x83f52c, 0x4cbb17, 0x00ee00, 0x00aa11
+                            ]),
+                            velmara: createMaterials([
+                                0xba3f35, 0xc11109, 0xba3f35, 0x854442, 0xba3f35, 0xc11109, 0xba3f35, 0xba3f35, 0x854442
+                            ]),
+                            almira: createMaterials([
+                                0x3b5998, 0x8b9dc3, 0x003366, 0x3b5998, 0x3b5998, 0x8b9dc3, 0x8b9dc3, 0x3b5998
+                            ]),
+                            brontis: createMaterials([
+                                0xffdc73, 0xbf9b30, 0xffbf00, 0xffcf40, 0xffdc73, 0xbf9b30, 0xffbf00, 0xa67c00, 0xffcf40
+                            ]),
+                            caldra: createMaterials([
+                                0x234d20, 0x36802d, 0x234d20, 0x77ab59, 0x234d20, 0x36802d, 0x36802d, 0x77ab59, 0x234d20
+                            ]),
+                            ocean: createMaterials([
+                                0x0f2342, 0x0f1e38
+                            ]),
+                            city: createMaterials([
+                                0xe6e6fa
+                            ])
+                        };
+
+                        if (tile.isCity) {
+                            return materialsMap["city"][0].clone();
+                        } else if (tile.land) {
+                            const continentKey = tile.continent?.toLowerCase();
+                            const materials = materialsMap[continentKey] || materialsMap["land"];
+                            return materials[Math.floor(Math.random() * materials.length)].clone();
+                        } else {
+                            const oceanMaterials = materialsMap["ocean"];
+                            return oceanMaterials[Math.floor(Math.random() * oceanMaterials.length)].clone();
+                    }
+                }
+
+                // Build geometry
+                const geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const indices = [];
+                tile.boundary.forEach(bp => {
+                    vertices.push(bp.x, bp.y, bp.z);
+                });
+
+                // Create faces based on number of vertices (assuming pentagon or hexagon)
+                indices.push(0, 1, 2);
+                indices.push(0, 2, 3);
+                indices.push(0, 3, 4);
+                if (vertices.length / 3 > 5) {
+                    indices.push(0, 4, 5);
+                }
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                geometry.setIndex(indices);
+                geometry.computeVertexNormals();
+
+                // Customize tile colors
+                const material = getTileMaterial(tile);
+                material.opacity = 1;
+                material.transparent = true;
+
+                // Add tile to scene
+                const mesh = new THREE.Mesh(geometry, material);
+                this.scene.add(mesh);
+                this.globeGroup.add(mesh);
+                tile.mesh = mesh;
+                this.tileMap.set(mesh.uuid, tile);
+            });
+            console.log('Tiles loaded:', this.tileMap.size);
+
+            } catch (error) {
+            console.error('Error loading tiles:', error);
+        }
     }
 
     // Feature 1: For moving the globe with the mouse
@@ -319,9 +363,10 @@ class GlobeApp {
         this.camera.position.z += (this.targetZoom - this.camera.position.z) * 0.1;
         this.renderer.render(this.scene, this.camera);
         }
-  }
+}
 
 window.addEventListener("DOMContentLoaded", () => {
+    
     // Render the globe
     new GlobeApp();
 });

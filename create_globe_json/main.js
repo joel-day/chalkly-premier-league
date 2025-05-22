@@ -1,9 +1,19 @@
-// ! npm install canvas
-const Hexasphere = require('./utils/hexasphere'); // or import Hexasphere from './hexasphere' if using ES6
+/////////////////////////////////////
+// This file creates a json file to later render a 3d globe in the '/visualize_globe_data/main.js' file. 
+// The json file is a dctionary of tile data, where each tile is a ahexagon on the 3d globe.
+// The pint and face javascript files are used in the hexasphere.js file only
+// If you want to add more tile features, make sure to it to the tile.tojson() function in the tile.js
+// The input is a png file which will determine which tiles are land, and identify continents. 
+// An equal number of cities are randomly placed each continent.
+// num_divisions = 25 leads to around 6000 tiles 
+///////////////////////////////////////
+
+const Hexasphere = require('./utils/hexasphere');
 const { createCanvas, loadImage } = require('canvas');
 const fs = require('fs');
+const { assign_land_continent } = require('./utils/helpers');
+const { shuffle } = require('./utils/helpers');
 
-// Helper functions
 function assignIds(tiles) {
     let counter = 69;
     for (const t of tiles) {
@@ -23,73 +33,31 @@ function checkPentagon(tiles) {
 }
 
 function assignLand(tiles, img, radius) {
-    const land_tiles = [];
 
-    function isLand(lat, lon) {
-        // Convert lat/lon to x/y pixel coordinates
-        const x = parseInt(img.width * (lon + 180) / 360);
-        const y = parseInt(img.height * (lat + 90) / 180);
-
-        const index = (y * pixelData.width + x) * 4;
-
-        const r = pixelData.data[index];
-        const g = pixelData.data[index + 1];
-        const b = pixelData.data[index + 2];
-        const alpha = pixelData.data[index + 3];
-
-        // RGB to continent name mapping
-        let continent = null;
-        if (r === 0 && g === 0 && b === 0) {
-            continent = "Velmara";
-        } else if (r === 255 && g === 0 && b === 0) {
-            continent = "Almira";
-        } else if (r === 0 && g === 255 && b === 0) {
-            continent = "Brontis";
-        } else if (r === 0 && g === 0 && b === 255) {
-            continent = "Caldra";
-        } else if (r === 255 && g === 255 && b === 255) {
-            continent = "Zevarn";
-        }
-
-        // Still return whether it's land and which continent
-        return {
-            land: alpha > 0,
-            continent: alpha > 0 ? continent : 'na'
-        };
-    }
-
+    // Creates an off-screen HTML canvas element with the same width and height the image
     const projectionCanvas = createCanvas(img.width, img.height);
+    // Gets the 2D drawing context for the canvas
     const projectionContext = projectionCanvas.getContext('2d');
-
-
-    projectionCanvas.width = img.width;
-    projectionCanvas.height = img.height;
+    // This renders the image pixels onto the canvas 
     projectionContext.drawImage(img, 0, 0, img.width, img.height);
-
+    // Returns pixel properties object containing the 4 data properties (red, green, blue, alpha)
     var pixelData = projectionContext.getImageData(0, 0, img.width, img.height);
 
-    for (const t of tiles) {
-        const latLon = t.getLatLon(radius);
+    // Loop through each tile, get its location, assign land continent features based on pixelData
+    for (const tile of tiles) {
+        const { lat, lon } = tile.getLatLon(radius);
+        const { land, continent } = assign_land_continent(lat, lon, img, pixelData);
 
-        const { land, continent } = isLand(latLon.lat, latLon.lon);
-
-        t.land = land;
-        t.continent = continent;
-        land_tiles.push(t);
-
-
+        tile.land = land;
+        tile.continent = continent;
     }
-
-    return land_tiles; // Optional, returns list of city tiles
-};
+}
 
 function assignCities(allTiles, num_cities) {
     const city_tiles = [];
 
-    // Ensure all tiles have isCity initialized
-    for (const tile of allTiles) {
-        tile.isCity = false;
-    }
+    // Reset city status on all tiles
+    allTiles.forEach(tile => tile.isCity = false);
 
     // Filter valid land tiles (non-pentagon)
     const landTiles = allTiles.filter(t => t.land && !t.pentagon);
@@ -105,15 +73,7 @@ function assignCities(allTiles, num_cities) {
         continents[continent].push(tile);
     }
 
-    // Utility: Shuffle an array in-place
-    function shuffle(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    }
-
-    // Assign cities per continent
+    // Assign (n = num_cities) cities per continent
     for (const [continent, tiles] of Object.entries(continents)) {
         const citiesToPlace = num_cities[continent] || 0;
         if (tiles.length === 0 || citiesToPlace === 0) continue;
@@ -124,9 +84,8 @@ function assignCities(allTiles, num_cities) {
         for (const tile of tiles) {
             if (placed >= citiesToPlace) break;
 
-            // Ensure neighbors are actual tile objects
+            // Prevents cities from being on tiles next to each other
             const hasCityNeighbor = tile.neighbors.some(n => n.isCity === true);
-
             if (!hasCityNeighbor) {
                 tile.isCity = true;
                 city_tiles.push(tile);
@@ -138,11 +97,9 @@ function assignCities(allTiles, num_cities) {
             console.warn(`Not enough valid city tiles in ${continent}. Only placed ${placed} of ${citiesToPlace}.`);
         }
     }
-
-    return city_tiles;
 }
 
-// Main function to process tiles and add isLand property
+// Main function
 async function processTiles(num_cities, projection_image, num_divisions) {
     
     // Generate raw hexasphere json
@@ -151,35 +108,30 @@ async function processTiles(num_cities, projection_image, num_divisions) {
     // Assign Ids
     assignIds(hex.tiles);
 
+    // Prevent putting cities on the few pentagons that make this globe possible
     checkPentagon(hex.tiles);
 
     // Assign Land/Water based on hand drawn 2D projection
     const img = await loadImage(projection_image);
-    var land_tiles = assignLand(hex.tiles, img, hex.radius);
+    assignLand(hex.tiles, img, hex.radius);
 
     // Assign a custom number of cities
-    var city_tiles = assignCities(hex.tiles, num_cities);
+    assignCities(hex.tiles, num_cities);
 
     // Write to a file
     const jsonData = hex.toJson();
     fs.writeFileSync('visualize_globe_data/hexasphere.json', jsonData, 'utf8');
-
-    return { city_tiles, land_tiles };
-
 };
 
-// Run the function
-var projection_image = './create_globe_json/projection.png'
+// Run the Main function
 const num_cities = {
-    Velmara: 8,
-    Almira: 8,
-    Brontis: 8,
-    Caldra: 8
-    // Zevarn can be omitted or added if needed
+    Velmara: 8,   // 490 tiles on my custom map
+    Almira: 8,    // 484 tiles on my custom map
+    Brontis: 8,   // 487 tiles on my custom map
+    Caldra: 8     // 486 tiles on my custom map
 };
-var num_divisions = 25;
 
 (async () => {
-  const { city_tiles, land_tiles } = await processTiles(num_cities, projection_image, num_divisions);
+  await processTiles(num_cities, './create_globe_json/projection.png', 25);
 })();
 
