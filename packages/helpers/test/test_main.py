@@ -1,4 +1,4 @@
-from packages.models.main import main
+from packages.helpers.main import main
 
 
 # Call the main function
